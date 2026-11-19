@@ -1,7 +1,7 @@
 package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Rotation2d;
 import frc.robot.subsystems.swerve.DriveConstants.Gains;
 import frc.robot.subsystems.swerve.DriveConstants.MotionProfileGains;
 import org.littletonrobotics.junction.AutoLog;
@@ -48,5 +48,5 @@ public interface ModuleIO {
 
   default void setSupplyCurrentLimit(double amps) {}
 
-  public default void setNeutralMode(NeutralModeValue value) {}
+  public default void configNeutralMode(NeutralModeValue value) {}
 }

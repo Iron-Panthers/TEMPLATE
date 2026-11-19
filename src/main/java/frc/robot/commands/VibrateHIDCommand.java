@@ -1,9 +1,9 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
+import org.wpilib.driverstation.GenericHID;
+import org.wpilib.driverstation.GenericHID.RumbleType;
+import org.wpilib.system.Timer;
+import org.wpilib.command2.Command;
 
 public class VibrateHIDCommand extends Command {
   private GenericHID hid;
@@ -27,19 +27,19 @@ public class VibrateHIDCommand extends Command {
 
   @Override
   public void initialize() {
-    startTime = Timer.getFPGATimestamp();
-    hid.setRumble(RumbleType.kRightRumble, strength);
-    hid.setRumble(RumbleType.kLeftRumble, strength);
+    startTime = Timer.getTimestamp();
+    hid.setRumble(RumbleType.RIGHT_RUMBLE, strength);
+    hid.setRumble(RumbleType.LEFT_RUMBLE, strength);
   }
 
   @Override
   public void end(boolean interrupted) {
-    hid.setRumble(RumbleType.kRightRumble, 0);
-    hid.setRumble(RumbleType.kLeftRumble, 0);
+    hid.setRumble(RumbleType.RIGHT_RUMBLE, 0);
+    hid.setRumble(RumbleType.LEFT_RUMBLE, 0);
   }
 
   @Override
   public boolean isFinished() {
-    return Timer.getFPGATimestamp() >= startTime + duration;
+    return Timer.getTimestamp() >= startTime + duration;
   }
 }

@@ -1,10 +1,10 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import frc.robot.Constants.RobotType;
 import frc.robot.subsystems.swerve.DriveConstants;
 import frc.robot.utility.BlankSimulatedArena;
@@ -62,7 +62,7 @@ public class RobotSimState {
         new Rotation3d(0, 0, robotPose2d.getRotation().getRadians()));
   }
 
-  public ChassisSpeeds getChassisSpeedsFieldRelative() {
-    return driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative();
+  public ChassisVelocities getChassisVelocitiesFieldRelative() {
+    return driveSimulation.getDriveTrainSimulatedChassisVelocitiesFieldRelative();
   }
 }

@@ -8,11 +8,13 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Voltage;
+import org.wpilib.math.util.Units;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.AngularVelocity;
+import org.wpilib.units.measure.Current;
+import org.wpilib.units.measure.Voltage;
+
+import frc.robot.Constants;
 import frc.robot.MotorOutputManager;
 import java.util.ArrayList;
 
@@ -35,7 +37,7 @@ public abstract class GenericRollersIOTalonFX implements GenericRollersIO {
   private final double mechanismReduction;
 
   public GenericRollersIOTalonFX(GenericRollersConfiguration rollersConfig) {
-    talon = new TalonFX(rollersConfig.id);
+    talon = new TalonFX(rollersConfig.id, Constants.CAN_BUS);
 
     mechanismReduction = rollersConfig.reduction;
 
@@ -55,10 +57,10 @@ public abstract class GenericRollersIOTalonFX implements GenericRollersIO {
     followerMotorSupplyCurrents = new ArrayList<>();
     for (GenericRollersConfiguration.FollowerMotorConfig followerConfig :
         rollersConfig.followerMotors) {
-      TalonFX followerTalon = new TalonFX(followerConfig.id());
+      TalonFX followerTalon = new TalonFX(followerConfig.id(), Constants.CAN_BUS);
       followerTalon.setControl(
           new Follower(rollersConfig.id, followerConfig.motorAlignmentValue()));
-      followerTalon.setNeutralMode(rollersConfig.neutralMode);
+      followerTalon.configNeutralMode(rollersConfig.neutralMode);
       followerTalon.getConfigurator().apply(config);
       followerTalon.optimizeBusUtilization();
       followerMotors.add(followerTalon);

@@ -5,20 +5,23 @@ import static frc.robot.subsystems.swerve.DriveConstants.KINEMATICS;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.util.FlippingUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.kinematics.SwerveDriveKinematics;
+import org.wpilib.math.kinematics.SwerveModulePosition;
+import org.wpilib.math.kinematics.SwerveModuleVelocity;
+import org.wpilib.units.Units;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.system.Timer;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.FunctionalCommand;
+import org.wpilib.command2.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotState;
 import frc.robot.subsystems.swerve.controllers.heading.AutoAlignHeadingController;
@@ -58,14 +61,14 @@ public class Drive extends SubsystemBase {
   @AutoLogOutput(key = "Swerve/Current Position")
   private Pose2d currentPosition = new Pose2d();
 
-  private ChassisSpeeds targetSpeeds = new ChassisSpeeds();
-  private ChassisSpeeds trajectorySpeeds = new ChassisSpeeds();
+  private ChassisVelocities targetSpeeds = new ChassisVelocities();
+  private ChassisVelocities trajectorySpeeds = new ChassisVelocities();
 
   @AutoLogOutput(key = "Swerve/Center of Rotation")
   private Translation2d centerOfRotation = new Translation2d();
 
   private double speedMagnitude =
-      Math.hypot(targetSpeeds.vxMetersPerSecond, targetSpeeds.vyMetersPerSecond);
+      Math.hypot(targetSpeeds.vx, targetSpeeds.vy);
 
   private Pose2d targetPosition = new Pose2d();
 
@@ -120,18 +123,18 @@ public class Drive extends SubsystemBase {
           // 0.d0001 to make the wheels stop in a diamond shape instead of straight so they do not
           // vibrate
           double rotationVelocity = headingController.update();
-          targetSpeeds.omegaRadiansPerSecond =
+          targetSpeeds.omega =
               Math.abs(rotationVelocity) > 0.0001 ? rotationVelocity : 0.0001;
         }
 
         if (speedMagnitude < 0.01
-            && Math.abs(targetSpeeds.omegaRadiansPerSecond) < 0.1
+            && Math.abs(targetSpeeds.omega) < 0.1
             && isScoped
             && isBeingDefended) {
-          if (Math.abs(headingController.getTargetHeading().plus(Rotation2d.kCW_90deg).getDegrees())
+          if (Math.abs(headingController.getTargetHeading().plus(Rotation2d.CW_90DEG).getDegrees())
                   < 17
               || Math.abs(
-                      headingController.getTargetHeading().plus(Rotation2d.kCCW_90deg).getDegrees())
+                      headingController.getTargetHeading().plus(Rotation2d.CCW_90DEG).getDegrees())
                   < 17) {
             setDefenseMode(true);
           } else {
@@ -140,7 +143,7 @@ public class Drive extends SubsystemBase {
         }
         isFromTeleop = true;
         
-        ChassisSpeeds vSpeeds = new ChassisSpeeds(-targetSpeeds.omegaRadiansPerSecond * centerOfRotation.getY(), targetSpeeds.omegaRadiansPerSecond * centerOfRotation.getX(), 0.0);
+        ChassisVelocities vSpeeds = new ChassisVelocities(-targetSpeeds.omega * centerOfRotation.getY(), targetSpeeds.omega * centerOfRotation.getX(), 0.0);
         targetSpeeds = targetSpeeds.plus(vSpeeds);
         }
         
@@ -156,29 +159,29 @@ public class Drive extends SubsystemBase {
           // 0.d0001 to make the wheels stop in a diamond shape instead of straight so they do not
           // vibrate
           double rotationVelocity = headingController.update();
-          targetSpeeds.omegaRadiansPerSecond =
+          targetSpeeds.omega =
               Math.abs(rotationVelocity) > 0.0001 ? rotationVelocity : 0.0001;
         }
       }
       case AUTO_ALIGN -> {
         if (pidAutoAlignController != null) {
           targetSpeeds = pidAutoAlignController.update();
-          targetSpeeds.omegaRadiansPerSecond = autoAlignHeadingController.update();
+          targetSpeeds.omega = autoAlignHeadingController.update();
 
           if (speedMagnitude < 0.01
-              && Math.abs(targetSpeeds.omegaRadiansPerSecond) < 0.1
+              && Math.abs(targetSpeeds.omega) < 0.1
               && isScoped
               && isBeingDefended) {
             if (Math.abs(
                         autoAlignHeadingController
                             .getTargetHeading()
-                            .plus(Rotation2d.kCW_90deg)
+                            .plus(Rotation2d.CW_90DEG)
                             .getDegrees())
                     < 17
                 || Math.abs(
                         autoAlignHeadingController
                             .getTargetHeading()
-                            .plus(Rotation2d.kCCW_90deg)
+                            .plus(Rotation2d.CCW_90DEG)
                             .getDegrees())
                     < 17) {
               setDefenseMode(true);
@@ -188,7 +191,7 @@ public class Drive extends SubsystemBase {
           }
           isFromTeleop = false;
         } else if (headingController != null) {
-          targetSpeeds.omegaRadiansPerSecond = headingController.update();
+          targetSpeeds.omega = headingController.update();
         }
       }
       case AXIS_ASSIST -> {
@@ -196,7 +199,7 @@ public class Drive extends SubsystemBase {
           targetSpeeds = axisAssistController.update();
 
           if (headingController != null) {
-            targetSpeeds.omegaRadiansPerSecond = headingController.update();
+            targetSpeeds.omega = headingController.update();
           }
         }
       }
@@ -206,35 +209,35 @@ public class Drive extends SubsystemBase {
           // 0.d0001 to make the wheels stop in a diamond shape instead of straight so they do not
           // vibrate
           double rotationVelocity = headingController.update();
-          targetSpeeds.omegaRadiansPerSecond =
+          targetSpeeds.omega =
               Math.abs(rotationVelocity) > 0.0001 ? rotationVelocity : 0.0001;
         }
         double speedMagnitude =
-            Math.hypot(targetSpeeds.vxMetersPerSecond, targetSpeeds.vyMetersPerSecond);
+            Math.hypot(targetSpeeds.vx, targetSpeeds.vy);
 
         Logger.recordOutput("Swerve/Speed Magnitude", speedMagnitude);
-        Logger.recordOutput("Swerve/Angular Velocity", targetSpeeds.omegaRadiansPerSecond);
+        Logger.recordOutput("Swerve/Angular Velocity", targetSpeeds.omega);
 
         if (isFromTeleop) {
-          if (speedMagnitude > 0.015 || Math.abs(targetSpeeds.omegaRadiansPerSecond) > 0.4) {
+          if (speedMagnitude > 0.015 || Math.abs(targetSpeeds.omega) > 0.4) {
             driveMode = DriveModes.TELEOP;
           }
         } else {
-          if (speedMagnitude > 0.015 || Math.abs(targetSpeeds.omegaRadiansPerSecond) > 0.4) {
+          if (speedMagnitude > 0.015 || Math.abs(targetSpeeds.omega) > 0.4) {
             driveMode = DriveModes.AUTO_ALIGN;
           }
         }
 
         if (isHDefense) {
-          modules[0].runToSetpoint(new SwerveModuleState(0, new Rotation2d(Math.toRadians(0))));
-          modules[1].runToSetpoint(new SwerveModuleState(0, new Rotation2d(Math.toRadians(0))));
-          modules[2].runToSetpoint(new SwerveModuleState(0, new Rotation2d(Math.toRadians(0))));
-          modules[3].runToSetpoint(new SwerveModuleState(0, new Rotation2d(Math.toRadians(0))));
+          modules[0].runToSetpoint(new SwerveModuleVelocity(0, new Rotation2d(Math.toRadians(0))));
+          modules[1].runToSetpoint(new SwerveModuleVelocity(0, new Rotation2d(Math.toRadians(0))));
+          modules[2].runToSetpoint(new SwerveModuleVelocity(0, new Rotation2d(Math.toRadians(0))));
+          modules[3].runToSetpoint(new SwerveModuleVelocity(0, new Rotation2d(Math.toRadians(0))));
         } else {
-          modules[0].runToSetpoint(new SwerveModuleState(0, new Rotation2d(Math.toRadians(-135))));
-          modules[1].runToSetpoint(new SwerveModuleState(0, new Rotation2d(Math.toRadians(135))));
-          modules[2].runToSetpoint(new SwerveModuleState(0, new Rotation2d(Math.toRadians(-225))));
-          modules[3].runToSetpoint(new SwerveModuleState(0, new Rotation2d(Math.toRadians(225))));
+          modules[0].runToSetpoint(new SwerveModuleVelocity(0, new Rotation2d(Math.toRadians(-135))));
+          modules[1].runToSetpoint(new SwerveModuleVelocity(0, new Rotation2d(Math.toRadians(135))));
+          modules[2].runToSetpoint(new SwerveModuleVelocity(0, new Rotation2d(Math.toRadians(-225))));
+          modules[3].runToSetpoint(new SwerveModuleVelocity(0, new Rotation2d(Math.toRadians(225))));
         }
       }
     }
@@ -243,13 +246,14 @@ public class Drive extends SubsystemBase {
     // run modules
     /* use kinematics to get desired module states */
     if (driveMode != DriveModes.DEFENSE) {
-      ChassisSpeeds discretizedSpeeds =
-          ChassisSpeeds.discretize(targetSpeeds, Constants.PERIODIC_LOOP_SEC);
+      ChassisVelocities discretizedSpeeds =
+          targetSpeeds.discretize(Constants.PERIODIC_LOOP_SEC);
 
-      SwerveModuleState[] moduleTargetStates = KINEMATICS.toSwerveModuleStates(discretizedSpeeds);
-
-      SwerveDriveKinematics.desaturateWheelSpeeds(
-          moduleTargetStates, DriveConstants.DRIVE_CONFIG.maxLinearVelocity());
+      // 2027: desaturateWheelVelocities returns a new array instead of mutating
+      SwerveModuleVelocity[] moduleTargetStates =
+          SwerveDriveKinematics.desaturateWheelVelocities(
+              KINEMATICS.toSwerveModuleVelocities(discretizedSpeeds),
+              DriveConstants.DRIVE_CONFIG.maxLinearVelocity());
 
       for (int i = 0; i < modules.length; i++) {
         modules[i].runToSetpoint(moduleTargetStates[i]);
@@ -262,7 +266,7 @@ public class Drive extends SubsystemBase {
     Logger.recordOutput("Swerve/Drive Mode", driveMode);
     Logger.recordOutput(
         "Swerve/Magnitude",
-        Math.hypot(targetSpeeds.vxMetersPerSecond, targetSpeeds.vyMetersPerSecond));
+        Math.hypot(targetSpeeds.vx, targetSpeeds.vy));
     Logger.recordOutput("Swerve/Field Relative Yaw", fieldRelativeYaw);
     Logger.recordOutput("Swerve/Trajectory Speeds", trajectorySpeeds);
     if (headingController != null) {
@@ -290,7 +294,7 @@ public class Drive extends SubsystemBase {
   }
 
   public void driveTeleopController(double xAxis, double yAxis, double omega, double acceleration) {
-    if (DriverStation.isTeleopEnabled()) {
+    if (org.wpilib.driverstation.RobotState.isTeleopEnabled()) {
       if (driveMode != DriveModes.TELEOP
           && driveMode != DriveModes.AXIS_ASSIST
           && driveMode != DriveModes.DEFENSE) {
@@ -304,7 +308,7 @@ public class Drive extends SubsystemBase {
     }
   }
 
-  public void setTrajectorySpeeds(ChassisSpeeds speeds) {
+  public void setTrajectorySpeeds(ChassisVelocities speeds) {
     driveMode = DriveModes.TRAJECTORY;
     this.trajectorySpeeds = speeds;
   }
@@ -329,15 +333,15 @@ public class Drive extends SubsystemBase {
   }
 
   @AutoLogOutput(key = "Swerve/Module States")
-  public SwerveModuleState[] getModuleStates() {
+  public SwerveModuleVelocity[] getModuleStates() {
     return Arrays.stream(modules)
         .map(module -> module.getModuleState())
-        .toArray(SwerveModuleState[]::new);
+        .toArray(SwerveModuleVelocity[]::new);
   }
 
   @AutoLogOutput(key = "Swerve/Robot Speeds")
-  public ChassisSpeeds getRobotSpeeds() {
-    return KINEMATICS.toChassisSpeeds(getModuleStates());
+  public ChassisVelocities getRobotSpeeds() {
+    return KINEMATICS.toChassisVelocities(getModuleStates());
   }
 
   public void setTargetHeading(Rotation2d targetHeading) {
@@ -419,7 +423,7 @@ public class Drive extends SubsystemBase {
     pidAutoAlignController = null;
     autoAlignHeadingController = null;
     axisAssistController = null;
-    targetSpeeds = new ChassisSpeeds();
+    targetSpeeds = new ChassisVelocities();
   }
 
   public Command setTargetPositionCommand(Pose2d targetPosition) {
@@ -486,9 +490,9 @@ public class Drive extends SubsystemBase {
     return pidAutoAlignController.almostAtTarget();
   }
 
-  public void setNeutralMode(NeutralModeValue value) {
+  public void configNeutralMode(NeutralModeValue value) {
     for (Module module : modules) {
-      module.setNeutralMode(value);
+      module.configNeutralMode(value);
     }
   }
 

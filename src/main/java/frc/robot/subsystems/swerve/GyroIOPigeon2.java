@@ -1,15 +1,16 @@
 package frc.robot.subsystems.swerve;
 
-import static edu.wpi.first.units.Units.Degree;
+import static org.wpilib.units.Units.Degree;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
+import frc.robot.Constants;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.util.Units;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.AngularVelocity;
 
 public class GyroIOPigeon2 implements GyroIO {
   private final Pigeon2 pigeon;
@@ -17,7 +18,7 @@ public class GyroIOPigeon2 implements GyroIO {
   private final StatusSignal<AngularVelocity> yawVelocity;
 
   public GyroIOPigeon2() {
-    pigeon = new Pigeon2(DriveConstants.GYRO_ID);
+    pigeon = new Pigeon2(DriveConstants.GYRO_ID, Constants.CAN_BUS);
     Pigeon2Configuration config = new Pigeon2Configuration();
     config.MountPose.withMountPosePitch(
         DriveConstants.IS_GYRO_UPSIDEDOWN ? Degree.of(180) : Degree.of(0));

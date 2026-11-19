@@ -8,6 +8,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import frc.robot.Constants;
+
 public abstract class GenericRollersIOSim implements GenericRollersIO {
   protected final TalonFX talon;
 
@@ -17,7 +19,7 @@ public abstract class GenericRollersIOSim implements GenericRollersIO {
 
   public GenericRollersIOSim(
       int id, int currentLimitAmps, boolean inverted, boolean brake, double reduction) {
-    talon = new TalonFX(id);
+    talon = new TalonFX(id, Constants.CAN_BUS);
 
     mechanismReduction = reduction;
 

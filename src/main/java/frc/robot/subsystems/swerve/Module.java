@@ -1,9 +1,9 @@
 package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.SwerveModulePosition;
+import org.wpilib.math.kinematics.SwerveModuleVelocity;
 import org.littletonrobotics.junction.Logger;
 
 public class Module {
@@ -25,13 +25,14 @@ public class Module {
     Logger.recordOutput("Swerve/Module" + index + "/Total Amp Seconds", totalAmps);
   }
 
-  public void runToSetpoint(SwerveModuleState targetState) {
-    targetState.optimize(getSteerHeading());
-    targetState.cosineScale(getSteerHeading());
+  public void runToSetpoint(SwerveModuleVelocity targetState) {
+    // 2027: optimize/cosineScale return new objects instead of mutating
+    targetState = targetState.optimize(getSteerHeading());
+    targetState = targetState.cosineScale(getSteerHeading());
     moduleIO.runSteerPositionSetpoint(targetState.angle.getRadians());
 
     double driveVelocityRads =
-        ((targetState.speedMetersPerSecond) / DriveConstants.DRIVE_CONFIG.wheelRadius());
+        ((targetState.velocity) / DriveConstants.DRIVE_CONFIG.wheelRadius());
 
     moduleIO.runDriveVelocitySetpoint(driveVelocityRads);
 
@@ -51,15 +52,15 @@ public class Module {
     return new SwerveModulePosition(inputs.drivePositionMeters, inputs.steerAbsolutePosition);
   }
 
-  public SwerveModuleState getModuleState() {
-    return new SwerveModuleState(inputs.driveVelocityMetersPerSec, inputs.steerAbsolutePosition);
+  public SwerveModuleVelocity getModuleState() {
+    return new SwerveModuleVelocity(inputs.driveVelocityMetersPerSec, inputs.steerAbsolutePosition);
   }
 
   public void setDriveSupplyCurrentLimit(double currentLimitAmps) {
     moduleIO.setSupplyCurrentLimit(currentLimitAmps);
   }
 
-  public void setNeutralMode(NeutralModeValue value) {
-    moduleIO.setNeutralMode(value);
+  public void configNeutralMode(NeutralModeValue value) {
+    moduleIO.configNeutralMode(value);
   }
 }

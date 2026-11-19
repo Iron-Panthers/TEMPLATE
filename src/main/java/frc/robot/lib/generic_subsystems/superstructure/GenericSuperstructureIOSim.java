@@ -11,6 +11,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import frc.robot.Constants;
+
 public abstract class GenericSuperstructureIOSim implements GenericSuperstructureIO {
 
   protected final TalonFX talon;
@@ -27,8 +29,8 @@ public abstract class GenericSuperstructureIOSim implements GenericSuperstructur
 
   public GenericSuperstructureIOSim(int id) {
 
-    talon = new TalonFX(id);
-    talon.setNeutralMode(NeutralModeValue.Brake);
+    talon = new TalonFX(id, Constants.CAN_BUS);
+    talon.configNeutralMode(NeutralModeValue.Brake);
     config =
         new TalonFXConfiguration()
             .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));

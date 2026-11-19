@@ -2,12 +2,12 @@ package frc.robot.subsystems.vision;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N3;
+import org.wpilib.command2.SubsystemBase;
 import frc.robot.RobotState;
 import frc.robot.RobotState.VisionMeasurement;
 import frc.robot.subsystems.vision.VisionIO.PoseObservation;
@@ -51,7 +51,7 @@ public class Vision extends SubsystemBase {
       List<Pose3d> rejectedPoses = new ArrayList<Pose3d>();
 
       for (int id : inputs[cameraIndex].tagIDs) {
-        Optional<Pose3d> tagPose = APRIL_TAG_FIELD_LAYOUT.getTagPose(id);
+        Optional<Pose3d> tagPose = FIELD_LAYOUT.getTagPose(id);
         if (tagPose.isPresent()) {
           tagPoses.add(tagPose.get());
         }
@@ -69,9 +69,9 @@ public class Vision extends SubsystemBase {
 
                 // Must be within the field boundaries
                 || observation.estimatedPose().getX() < 0.0
-                || observation.estimatedPose().getX() > APRIL_TAG_FIELD_LAYOUT.getFieldLength()
+                || observation.estimatedPose().getX() > FIELD_LAYOUT.getFieldLength()
                 || observation.estimatedPose().getY() < 0.0
-                || observation.estimatedPose().getY() > APRIL_TAG_FIELD_LAYOUT.getFieldWidth();
+                || observation.estimatedPose().getY() > FIELD_LAYOUT.getFieldWidth();
 
         // log poses
         estimatedPoses.add(observation.estimatedPose());
@@ -86,7 +86,7 @@ public class Vision extends SubsystemBase {
 
         Matrix<N3, N1> visionStdDevs =
             TAG_COUNT_DEVIATIONS
-                .get(MathUtil.clamp(observation.tagCount() - 1, 0, TAG_COUNT_DEVIATIONS.size() - 1))
+                .get(Math.clamp(observation.tagCount() - 1, 0, TAG_COUNT_DEVIATIONS.size() - 1))
                 .computeDeviation(observation.averageDistance());
         Logger.recordOutput("Vision/Camera" + cameraIndex + "/Std Devs", visionStdDevs);
         RobotState.getInstance().addVisionMeasurement(measurement, visionStdDevs);

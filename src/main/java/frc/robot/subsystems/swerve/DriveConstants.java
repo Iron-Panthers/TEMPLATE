@@ -1,9 +1,9 @@
 package frc.robot.subsystems.swerve;
 
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
-import static edu.wpi.first.units.Units.Kilograms;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Volts;
+import static org.wpilib.units.Units.KilogramSquareMeters;
+import static org.wpilib.units.Units.Kilograms;
+import static org.wpilib.units.Units.Meters;
+import static org.wpilib.units.Units.Volts;
 import static frc.robot.Constants.getRobotType;
 
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -15,19 +15,19 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.util.FlippingUtil;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.util.Pair;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.geometry.Twist2d;
+import org.wpilib.math.kinematics.SwerveDriveKinematics;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N3;
+import org.wpilib.math.system.DCMotor;
+import org.wpilib.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.RobotState;
 import frc.robot.subsystems.can_watchdog.CANWatchdogConstants.CAN;
@@ -94,8 +94,8 @@ public class DriveConstants {
 
   public static final Rotation2d GYRO_ROTATION_OFFSET =
       switch (getRobotType()) {
-        case COMP -> Rotation2d.kCW_90deg;
-        default -> Rotation2d.kZero;
+        case COMP -> Rotation2d.CW_90DEG;
+        default -> Rotation2d.ZERO;
       };
 
   // fl, fr, bl, br; negate offsets
@@ -229,6 +229,7 @@ public class DriveConstants {
   public static final DriveTrainSimulationConfig
       mapleSimConfig = // TODO: update this to be similar to comp bot drive base
       DriveTrainSimulationConfig.Default()
+      //TODO:MAPLE SIM ERRORS
               .withRobotMass(Kilograms.of(54.4311))
               .withCustomModuleTranslations(MODULE_TRANSLATIONS)
               .withGyro(COTS.ofPigeon2())

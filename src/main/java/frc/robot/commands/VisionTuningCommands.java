@@ -1,15 +1,15 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.util.Units;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.Commands;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkChooser;
 
 public class VisionTuningCommands {
   private static class TransformAverage {
@@ -43,9 +43,9 @@ public class VisionTuningCommands {
 
   /** Adds the drive tuning commands to the auto chooser. */
   public static void addTuningCommandsToAutoChooser(
-      Vision vision, LoggedDashboardChooser<Command> chooser) {
+      Vision vision, LoggedNetworkChooser<Command> chooser) {
     // We may want to run this at a competition
-    chooser.addOption(
+    chooser.add(
         "TUNING | Vision Camera Position Measurement", measureCameraPositions(vision));
   }
 
@@ -59,7 +59,7 @@ public class VisionTuningCommands {
               ),
           new Rotation3d(0., 0., Units.degreesToRadians(180)));
 
-  public static Pose3d heldTagPose = VisionConstants.APRIL_TAG_FIELD_LAYOUT.getTagPose(10).get();
+  public static Pose3d heldTagPose = VisionConstants.FIELD_LAYOUT.getTagPose(10).get();
 
   // 481.387in
 

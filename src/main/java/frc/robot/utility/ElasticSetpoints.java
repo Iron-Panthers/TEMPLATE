@@ -1,7 +1,7 @@
 package frc.robot.utility;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.tunable.Tunables;
+import org.wpilib.command2.SubsystemBase;
 import java.util.HashMap;
 
 public class ElasticSetpoints extends SubsystemBase {
@@ -60,7 +60,7 @@ public class ElasticSetpoints extends SubsystemBase {
     for (String key : setpoints.keySet()) {
       // check if the setpoint exists in elastic
       if (!SmartDashboard.containsKey(key)) {
-        SmartDashboard.putNumber(key, setpoints.get(key));
+        Tunables.publishDouble(key, setpoints.get(key));
       }
       // update the setpoint value from elastic
       setpoints.put(key, SmartDashboard.getNumber(key, setpoints.get(key)));

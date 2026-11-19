@@ -1,19 +1,19 @@
 package frc.robot.subsystems.swerve.controllers.translation;
 
-import static edu.wpi.first.units.Units.Meters;
+import static org.wpilib.units.Units.Meters;
 import static frc.robot.subsystems.swerve.DriveConstants.AUTOALIGN_POSITION_DEADBAND;
 import static frc.robot.subsystems.swerve.DriveConstants.AUTOALIGN_VELOCITY_DEADBAND;
 import static frc.robot.subsystems.swerve.DriveConstants.DRIVE_CONFIG;
 import static frc.robot.subsystems.swerve.DriveConstants.PID_AUTOALIGN_CONSTANTS;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Distance;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.controller.ProfiledPIDController;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.trajectory.TrapezoidProfile.Constraints;
+import org.wpilib.units.Units;
+import org.wpilib.units.measure.Distance;
 import frc.robot.Constants;
 import frc.robot.RobotState;
 import java.util.function.Supplier;
@@ -124,16 +124,16 @@ public class AxisAssist extends BaseTranslationController {
   }
 
   // update the values
-  public ChassisSpeeds update() {
+  public ChassisVelocities update() {
     calculateLinearMovement();
     Distance controlAxisVel = calculateLinearVelocity(controlY ? controllerY : controllerX);
     Logger.recordOutput("Swerve/Axis Assist/ControlAxisVel", controlAxisVel);
     Logger.recordOutput("Swerve/Axis Assist/PidAxisVel", pidAxisVel);
-    return ChassisSpeeds.fromFieldRelativeSpeeds(
-        controlY ? pidAxisVel.in(Units.Meters) : controlAxisVel.in(Units.Meters),
-        controlY ? controlAxisVel.in(Units.Meters) : pidAxisVel.in(Units.Meters),
-        0,
-        headingSupplier.get().plus(Rotation2d.k180deg));
+    return new ChassisVelocities(
+            controlY ? pidAxisVel.in(Units.Meters) : controlAxisVel.in(Units.Meters),
+            controlY ? controlAxisVel.in(Units.Meters) : pidAxisVel.in(Units.Meters),
+            0)
+        .toRobotRelative(headingSupplier.get().plus(Rotation2d.k180deg));
   }
 
   // log your data in advantage kit

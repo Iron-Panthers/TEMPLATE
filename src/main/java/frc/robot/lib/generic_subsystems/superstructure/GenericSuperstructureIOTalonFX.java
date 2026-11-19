@@ -1,6 +1,7 @@
 package frc.robot.lib.generic_subsystems.superstructure;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
@@ -15,10 +16,12 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Voltage;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.AngularVelocity;
+import org.wpilib.units.measure.Current;
+import org.wpilib.units.measure.Voltage;
+
+import frc.robot.Constants;
 import frc.robot.MotorOutputManager;
 import java.util.ArrayList;
 
@@ -82,10 +85,10 @@ public abstract class GenericSuperstructureIOTalonFX implements GenericSuperstru
       config.SoftwareLimitSwitch.withForwardSoftLimitThreshold(
           superstructureConfig.upperExtensionLimit);
     }
-    talon = new TalonFX(superstructureConfig.id);
+    talon = new TalonFX(superstructureConfig.id, Constants.CAN_BUS);
 
     if (superstructureConfig.canCoderID != -1) { // TODO: Make default -1 or use Optional
-      CANcoder canCoder = new CANcoder(superstructureConfig.canCoderID);
+      CANcoder canCoder = new CANcoder(superstructureConfig.canCoderID, new CANBus());
       canCoder
           .getConfigurator()
           .apply(
@@ -101,17 +104,17 @@ public abstract class GenericSuperstructureIOTalonFX implements GenericSuperstru
     // TODO: Do we need to try until OK?
     talon.getConfigurator().apply(config);
     setOffset();
-    talon.setNeutralMode(NeutralModeValue.Brake);
+    talon.configNeutralMode(NeutralModeValue.Brake);
 
     // Initialize follower motors
     followerMotors = new ArrayList<>();
     followerMotorSupplyCurrents = new ArrayList<>();
     for (GenericSuperstructureConfiguration.FollowerMotorConfig followerConfig :
         superstructureConfig.followerMotors) {
-      TalonFX followerTalon = new TalonFX(followerConfig.id());
+      TalonFX followerTalon = new TalonFX(followerConfig.id(), Constants.CAN_BUS);
       followerTalon.setControl(
           new Follower(superstructureConfig.id, followerConfig.motorAlignmentValue()));
-      followerTalon.setNeutralMode(NeutralModeValue.Brake);
+      followerTalon.configNeutralMode(NeutralModeValue.Brake);
       followerTalon.getConfigurator().apply(config);
       followerTalon.optimizeBusUtilization();
       followerMotors.add(followerTalon);

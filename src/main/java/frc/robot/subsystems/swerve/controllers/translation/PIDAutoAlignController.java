@@ -4,14 +4,14 @@ import static frc.robot.subsystems.swerve.DriveConstants.AUTOALIGN_POSITION_DEAD
 import static frc.robot.subsystems.swerve.DriveConstants.AUTOALIGN_VELOCITY_DEADBAND;
 import static frc.robot.subsystems.swerve.DriveConstants.PID_AUTOALIGN_CONSTANTS;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import org.wpilib.math.controller.ProfiledPIDController;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.trajectory.TrapezoidProfile;
+import org.wpilib.math.trajectory.TrapezoidProfile.Constraints;
+import org.wpilib.math.trajectory.TrapezoidProfile.State;
 import frc.robot.Constants;
 import frc.robot.RobotState;
 import java.util.function.Supplier;
@@ -126,12 +126,12 @@ public class PIDAutoAlignController extends BaseTranslationController {
   }
 
   // update the values
-  public ChassisSpeeds update() {
+  public ChassisVelocities update() {
     calculateLinearMovement();
     Logger.recordOutput("Swerve/PID Autoalign/XVel", xVel);
     Logger.recordOutput("Swerve/PID Autoalign/YVel", yVel);
-    return ChassisSpeeds.fromFieldRelativeSpeeds(
-        -xVel, -yVel, 0, positionSupplier.get().getRotation().plus(Rotation2d.k180deg));
+    return new ChassisVelocities(-xVel, -yVel, 0)
+        .toRobotRelative(positionSupplier.get().getRotation().plus(Rotation2d.k180deg));
   }
 
   // log your data in advantage kit

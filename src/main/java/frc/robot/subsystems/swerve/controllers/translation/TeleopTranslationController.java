@@ -2,13 +2,15 @@ package frc.robot.subsystems.swerve.controllers.translation;
 
 import static frc.robot.subsystems.swerve.DriveConstants.DRIVE_CONFIG;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Transform2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.tunable.TunableDouble;
+import org.wpilib.tunable.Tunables;
+
 import frc.robot.Constants;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -20,11 +22,12 @@ public class TeleopTranslationController extends BaseTranslationController {
   private Translation2d pastLinearVelocity = new Translation2d();
   private double clampedVelocityDiff = 0;
   private double acceleration;
+  private final TunableDouble turningSensitivity;
 
   /* teleop control with specified yaw supplier, typically "arbitrary" yaw */
   public TeleopTranslationController(Supplier<Rotation2d> yawSupplier) {
     super(yawSupplier);
-    SmartDashboard.putNumber("Turning Sensitivity", 1.5);
+    turningSensitivity = Tunables.addDouble("Turning Sensitivity", 1.5);
   }
 
   /* accept driver input from joysticks */
@@ -45,17 +48,17 @@ public class TeleopTranslationController extends BaseTranslationController {
   }
 
   /* update controller with current desired state */
-  public ChassisSpeeds update() {
+  public ChassisVelocities update() {
     Translation2d linearVelocity = calculateLinearVelocity(controllerX, controllerY);
     double omega = MathUtil.applyDeadband(controllerOmega, 0.001);
     omega =
         Math.copySign(
-            Math.pow(Math.abs(omega), SmartDashboard.getNumber("Turning Sensitivity", 1.5)), omega);
+            Math.pow(Math.abs(omega), turningSensitivity.get()), omega);
 
     // acceleration limiting
     Translation2d linearVelocityDiff = linearVelocity.minus(pastLinearVelocity);
     clampedVelocityDiff =
-        MathUtil.clamp(
+        Math.clamp(
             Math.abs(linearVelocity.getDistance(pastLinearVelocity)),
             0,
             acceleration * (Constants.PERIODIC_LOOP_SEC));
@@ -67,11 +70,11 @@ public class TeleopTranslationController extends BaseTranslationController {
         pastLinearVelocity.plus(new Translation2d(clampedVelocityDiff, velocityTheta));
     pastLinearVelocity = newVelocity;
 
-    return ChassisSpeeds.fromFieldRelativeSpeeds(
-        newVelocity.getX() * getMaxLinearVelocity(),
-        newVelocity.getY() * getMaxLinearVelocity(),
-        omega * DRIVE_CONFIG.maxAngularVelocity(),
-        yawSupplier.get());
+    return new ChassisVelocities(
+            newVelocity.getX() * getMaxLinearVelocity(),
+            newVelocity.getY() * getMaxLinearVelocity(),
+            omega * DRIVE_CONFIG.maxAngularVelocity())
+        .toRobotRelative(yawSupplier.get());
   }
 
   private double getMaxLinearVelocity() {

@@ -13,8 +13,12 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.wpilibj.RobotBase;
+import org.wpilib.math.geometry.Pose3d;
+
+import com.ctre.phoenix6.CANBus;
+
+import org.wpilib.framework.RobotBase;
+import org.wpilib.hardware.bus.CANPort;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
@@ -24,9 +28,11 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class Constants {
   public static final double PERIODIC_LOOP_SEC = 0.02;
 
-  public static final Pose3d MECHANISM_ROOT_POSE = Pose3d.kZero;
+  public static final Pose3d MECHANISM_ROOT_POSE = Pose3d.ZERO;
 
   public static final boolean REPLAY = false;
+
+  public static final CANBus CAN_BUS = new CANBus(CANPort.CAN_S0);
 
   @SuppressWarnings("unused")
   public static RobotType ROBOT_TYPE =

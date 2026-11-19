@@ -13,9 +13,9 @@
 
 package frc.robot.subsystems.vision;
 
-import static frc.robot.subsystems.vision.VisionConstants.APRIL_TAG_FIELD_LAYOUT;
+import static frc.robot.subsystems.vision.VisionConstants.FIELD_LAYOUT;
 
-import edu.wpi.first.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose2d;
 import java.util.function.Supplier;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
@@ -41,7 +41,7 @@ public class VisionIOPhotonvisionSim extends VisionIOPhotonvision {
     // Initialize vision sim
     if (visionSim == null) {
       visionSim = new VisionSystemSim("main");
-      visionSim.addAprilTags(APRIL_TAG_FIELD_LAYOUT);
+      visionSim.addAprilTags(FIELD_LAYOUT);
     }
 
     // Add sim camera

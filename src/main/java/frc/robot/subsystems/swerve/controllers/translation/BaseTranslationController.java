@@ -1,7 +1,7 @@
 package frc.robot.subsystems.swerve.controllers.translation;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import java.util.function.Supplier;
 
 public abstract class BaseTranslationController {
@@ -12,5 +12,5 @@ public abstract class BaseTranslationController {
     this.yawSupplier = yawSupplier;
   }
 
-  public abstract ChassisSpeeds update();
+  public abstract ChassisVelocities update();
 }

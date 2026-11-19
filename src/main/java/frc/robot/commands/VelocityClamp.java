@@ -1,9 +1,9 @@
 package frc.robot.commands;
 
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.Command;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.command2.Command;
 import frc.robot.RobotState;
 import frc.robot.subsystems.swerve.Drive;
 import frc.robot.subsystems.swerve.DriveConstants;
@@ -28,7 +28,7 @@ public class VelocityClamp extends Command {
     Pose2d estimatedPose = RobotState.getInstance().getEstimatedPose();
 
     PathPlannerTrajectoryState targetState = new PathPlannerTrajectoryState();
-    targetState.fieldSpeeds = new ChassisSpeeds();
+    targetState.fieldSpeeds = new ChassisVelocities();
     targetState.pose = estimatedPose;
 
     drive.setTrajectorySpeeds(
@@ -38,8 +38,8 @@ public class VelocityClamp extends Command {
 
   @Override
   public boolean isFinished() {
-    ChassisSpeeds robotSpeeds = drive.getRobotSpeeds();
-    double speed = Math.hypot(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond);
+    ChassisVelocities robotSpeeds = drive.getRobotSpeeds();
+    double speed = Math.hypot(robotSpeeds.vx, robotSpeeds.vy);
     return speed < 2;
   }
 }

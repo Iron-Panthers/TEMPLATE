@@ -1,6 +1,6 @@
 package frc.robot.subsystems.rgb;
 
-import edu.wpi.first.wpilibj.LEDPattern;
+import org.wpilib.hardware.led.LEDPattern;
 import frc.robot.Constants;
 
 public class RGBConstants {

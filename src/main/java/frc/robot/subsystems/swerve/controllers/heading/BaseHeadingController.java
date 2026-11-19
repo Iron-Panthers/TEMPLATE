@@ -2,10 +2,10 @@ package frc.robot.subsystems.swerve.controllers.heading;
 
 import static frc.robot.subsystems.swerve.DriveConstants.HEADING_CONTROLLER_CONSTANTS;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
+import org.wpilib.math.controller.ProfiledPIDController;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.trajectory.TrapezoidProfile.Constraints;
+import org.wpilib.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.subsystems.swerve.DriveConstants.HeadingControllerConstants;
 import java.util.function.Supplier;

@@ -1,6 +1,6 @@
 package frc.robot.subsystems.can_watchdog;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.command2.SubsystemBase;
 import frc.robot.subsystems.rgb.RGB;
 import frc.robot.subsystems.rgb.RGB.RGBMessages;
 import org.littletonrobotics.junction.Logger;

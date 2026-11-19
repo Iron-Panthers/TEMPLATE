@@ -1,8 +1,8 @@
 package frc.robot.subsystems.rgb;
 
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.LEDPattern;
+import org.wpilib.hardware.led.AddressableLED;
+import org.wpilib.hardware.led.AddressableLEDBuffer;
+import org.wpilib.hardware.led.LEDPattern;
 
 public class RGBIOAddressableLED implements RGBIO {
   private final AddressableLED addressableLED;

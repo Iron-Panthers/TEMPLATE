@@ -1,6 +1,6 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.command2.SubsystemBase;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;

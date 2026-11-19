@@ -6,21 +6,24 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.FlippingUtil;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj2.command.Command;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.util.Nat;
+import org.wpilib.math.estimator.SwerveDrivePoseEstimator;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Transform2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.kinematics.SwerveModulePosition;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N3;
+import org.wpilib.math.util.Units;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.framework.RobotBase;
+import org.wpilib.command2.Command;
 import frc.robot.subsystems.swerve.DriveConstants;
 import frc.robot.subsystems.vision.VisionConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -62,7 +65,7 @@ public class RobotState {
 
   private Pose2d lastApproachPose = new Pose2d();
 
-  private ChassisSpeeds robotSpeeds = new ChassisSpeeds();
+  private ChassisVelocities robotSpeeds = new ChassisVelocities();
 
   private static RobotState instance;
 
@@ -106,12 +109,8 @@ public class RobotState {
   @AutoLogOutput(key = "Robot State/Velocity")
   /* meters per second */
   public Translation2d getVelocity() {
-    return new Translation2d(
-            ChassisSpeeds.fromRobotRelativeSpeeds(robotSpeeds, estimatedPose.getRotation())
-                .vxMetersPerSecond,
-            ChassisSpeeds.fromRobotRelativeSpeeds(robotSpeeds, estimatedPose.getRotation())
-                .vyMetersPerSecond)
-        .rotateBy(Rotation2d.kPi);
+    ChassisVelocities fieldSpeeds = robotSpeeds.toFieldRelative(estimatedPose.getRotation());
+    return new Translation2d(fieldSpeeds.vx, fieldSpeeds.vy).rotateBy(Rotation2d.PI);
   }
 
   /* In inches because we are imperial... */
@@ -126,7 +125,7 @@ public class RobotState {
     double scalarX = theta.getCos() * mag;
     double scalarY = theta.getSin() * mag;
 
-    Transform2d transform = new Transform2d(scalarX, scalarY, Rotation2d.kZero);
+    Transform2d transform = new Transform2d(scalarX, scalarY, Rotation2d.ZERO);
     return pose.transformBy(transform);
   }
 
@@ -154,7 +153,7 @@ public class RobotState {
     return finalPathfindingCommand;
   }
 
-  public void addRobotSpeeds(ChassisSpeeds chassisSpeeds) {
+  public void addRobotSpeeds(ChassisVelocities chassisSpeeds) {
     this.robotSpeeds = chassisSpeeds;
   }
 
@@ -165,9 +164,9 @@ public class RobotState {
   @AutoLogOutput(key = "Robot State/isAllianceRed")
   public static boolean isAllianceRed() {
     // where true is red and false is blue
-    var alliance = DriverStation.getAlliance();
+    var alliance = MatchState.getAlliance();
     if (RobotBase.isReal()) {
-      return alliance.get() == DriverStation.Alliance.Red;
+      return alliance.get() == Alliance.RED;
     }
     return true;
   }

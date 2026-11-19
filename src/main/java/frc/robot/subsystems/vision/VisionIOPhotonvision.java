@@ -18,7 +18,7 @@ public class VisionIOPhotonvision implements VisionIO {
     camera = new PhotonCamera(name);
     estimator =
         new PhotonPoseEstimator(
-            VisionConstants.APRIL_TAG_FIELD_LAYOUT, VisionConstants.CAMERA_TRANSFORM[index]);
+            VisionConstants.FIELD_LAYOUT, VisionConstants.CAMERA_TRANSFORM[index]);
   }
 
   @Override

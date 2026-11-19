@@ -1,6 +1,6 @@
 package frc.robot.lib.generic_subsystems.superstructure;
 
-import edu.wpi.first.math.filter.LinearFilter;
+import org.wpilib.math.filter.LinearFilter;
 import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 

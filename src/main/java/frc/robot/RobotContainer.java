@@ -5,11 +5,11 @@ package frc.robot;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import org.wpilib.tunable.Tunables;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.CommandScheduler;
+import org.wpilib.command2.InstantCommand;
+import org.wpilib.command2.button.CommandXboxController;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.VibrateHIDCommand;
 import frc.robot.commands.VisionTuningCommands;
@@ -34,7 +34,7 @@ import frc.robot.utility.ElasticSetpoints;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -55,7 +55,7 @@ public class RobotContainer {
   private boolean defaultZeroing = false;
 
   // private SendableChooser<Command> autoChooser;
-  private LoggedDashboardChooser<Command> autoChooser;
+  private LoggedNetworkChooser<Command> autoChooser;
 
   private final CommandXboxController driverA = new CommandXboxController(0);
   private final CommandXboxController driverB = new CommandXboxController(1);
@@ -102,6 +102,8 @@ public class RobotContainer {
         case SIM -> {
           driveSimulation =
               new SwerveDriveSimulation(
+                //TODO: The maplesim isn't updated, it's still on 0.4.0, update and check back when something happens idk
+                //If maple sim is not 0.4.0 when you are reading this then delete these two comments
                   DriveConstants.mapleSimConfig, RobotState.getInstance().getEstimatedPose());
           SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
           swerve =
@@ -117,6 +119,8 @@ public class RobotContainer {
                       DriveConstants.MODULE_CONFIGS[3], driveSimulation.getModules()[3]));
           vision =
               new Vision(
+               //TODO: The maplesim isn't updated, it's still on 0.4.0, update and check back when something happens idk
+                    //If maple sim is not 0.4.0 when you are reading this then delete these two comments
                   new VisionIOPhotonvisionSim(
                       "arducam-3", 3, driveSimulation::getSimulatedDriveTrainPose));
           new VisionIOPhotonvisionSim("arducam-4", 4, driveSimulation::getSimulatedDriveTrainPose);
@@ -171,17 +175,17 @@ public class RobotContainer {
                   swerve.driveTeleopController(
                       -driverA.getLeftY(),
                       -driverA.getLeftX(),
-                      driverA.getLeftTriggerAxis() - driverA.getRightTriggerAxis(),
+                      driverA.getLeftTrigger() - driverA.getRightTrigger(),
                       DriveConstants.DRIVE_CONFIG.maxLinearAcceleration());
-                  if ((Math.abs(driverA.getLeftTriggerAxis()) > 0.1
-                          || Math.abs(driverA.getRightTriggerAxis()) > 0.1)) {
+                  if ((Math.abs(driverA.getLeftTrigger()) > 0.1
+                          || Math.abs(driverA.getRightTrigger()) > 0.1)) {
                     swerve.clearHeadingControl();
                   }
                 })
             .withName("Drive Teleop"));
     // adjust this for x swerve
 
-    driverA.start().onTrue(swerve.zeroGyroCommand());
+    driverA.menu().onTrue(swerve.zeroGyroCommand());
 
     driverA.a().onTrue(new InstantCommand(() -> swerve.smartZeroGyro()));
   }
@@ -210,9 +214,9 @@ public class RobotContainer {
         swerve);
 
     autoChooser =
-        new LoggedDashboardChooser<Command>("Auto Chooser", AutoBuilder.buildAutoChooser());
+        new LoggedNetworkChooser<Command>("Auto Chooser", AutoBuilder.buildAutoChooser());
     VisionTuningCommands.addTuningCommandsToAutoChooser(vision, autoChooser);
-    SmartDashboard.putData("Auto Chooser", autoChooser.getSendableChooser());
+    Tunables.publish("Auto Chooser", autoChooser.getSendableChooser());
   }
 
   public Command getAutoCommand() {
@@ -227,8 +231,8 @@ public class RobotContainer {
 
   // runs when teleop starts
   public void teleopInit() {
-    CommandScheduler.getInstance().schedule(new VibrateHIDCommand(driverB.getHID(), 5, .5));
-    swerve.setNeutralMode(NeutralModeValue.Brake);
+    CommandScheduler.getInstance().schedule(new VibrateHIDCommand(driverB.getController().getHID(), 5, .5));
+    swerve.configNeutralMode(NeutralModeValue.Brake);
   }
 
   /** Ran when periodic disabled */
@@ -253,5 +257,7 @@ public class RobotContainer {
     SimulatedArena.getInstance().simulationPeriodic();
     Logger.recordOutput(
         "FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
+        //TODO": The maplesim isn't updated, it's still on 0.4.0, update and check back when something happens idk
+        //If maple sim is not 0.4.0 when you are reading this then delete these two comments
   }
 }

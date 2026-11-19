@@ -1,6 +1,6 @@
 package frc.robot.utility;
 
-import edu.wpi.first.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Pose3d;
 
 /**
  * The {@code LoggableMechanism3d} interface represents a mechanism that can be logged and

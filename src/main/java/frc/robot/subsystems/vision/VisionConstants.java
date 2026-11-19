@@ -2,14 +2,14 @@ package frc.robot.subsystems.vision;
 
 import static frc.robot.Constants.*;
 
-import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
+import org.wpilib.fields.Field;
+import org.wpilib.fields.FieldTag;
+import org.wpilib.fields.Fields;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N3;
 import java.util.List;
 
 public class VisionConstants {
@@ -51,15 +51,15 @@ public class VisionConstants {
   // public static final int[] IGNORE_TAGS = {}; // removed
 
   // Fixed AprilTag field layout initialization
-  public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT;
+  public static final Field FIELD_LAYOUT;
 
   static {
     // logic for dynamically setting the april tag field layout
-    AprilTagFieldLayout defaultFieldLayout =
-        AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-    List<AprilTag> aprilTags = defaultFieldLayout.getTags();
+    Field defaultFieldLayout =
+        Field.loadField(Fields.DEFAULT_FIELD);
+    List<FieldTag> tags = defaultFieldLayout.getTags();
     // remove ignored tags
-    aprilTags.removeIf(
+    tags.removeIf(
         tag -> {
           for (int ignoreTag : IGNORE_TAGS) {
             if (tag.ID == ignoreTag) {
@@ -68,9 +68,9 @@ public class VisionConstants {
           }
           return false;
         });
-    APRIL_TAG_FIELD_LAYOUT =
-        new AprilTagFieldLayout(
-            aprilTags, defaultFieldLayout.getFieldLength(), defaultFieldLayout.getFieldWidth());
+    FIELD_LAYOUT =
+        new Field(
+            tags, defaultFieldLayout.getFieldLength(), defaultFieldLayout.getFieldWidth());
   }
 
   public static record TagCountDeviation(

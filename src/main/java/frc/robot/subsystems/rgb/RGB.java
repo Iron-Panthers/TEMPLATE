@@ -1,14 +1,14 @@
 package frc.robot.subsystems.rgb;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
+import static org.wpilib.units.Units.Meters;
+import static org.wpilib.units.Units.MetersPerSecond;
+import static org.wpilib.units.Units.Seconds;
 
-import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.wpilib.hardware.led.LEDPattern;
+import org.wpilib.util.Color;
+import org.wpilib.command2.Command;
+import org.wpilib.command2.InstantCommand;
+import org.wpilib.command2.SubsystemBase;
 import frc.robot.subsystems.rgb.RGBConstants.RGBMessage;
 import frc.robot.subsystems.rgb.RGBConstants.RGBMessage.MessagePriority;
 import java.util.Optional;
@@ -18,32 +18,32 @@ public class RGB extends SubsystemBase {
   public static enum RGBMessages {
     CRITICAL_NETWORK_FAILURE(
         new RGBMessage(
-            LEDPattern.solid(Color.kOrange).blink(Seconds.of(1 / 8)),
+            LEDPattern.solid(Color.ORANGE).blink(Seconds.of(1 / 8)),
             MessagePriority.A_CRITICAL_NETWORK_FAILURE,
             true)),
     MISSING_CAN_DEVICE(
-        new RGBMessage(LEDPattern.solid(Color.kRed), MessagePriority.B_MISSING_CAN_DEVICE, true)),
+        new RGBMessage(LEDPattern.solid(Color.RED), MessagePriority.B_MISSING_CAN_DEVICE, true)),
     L2(
         new RGBMessage(
-            LEDPattern.solid(Color.kOrange).blink(Seconds.of(1 / 8)), MessagePriority.E_L2, true)),
+            LEDPattern.solid(Color.ORANGE).blink(Seconds.of(1 / 8)), MessagePriority.E_L2, true)),
     L3(
         new RGBMessage(
-            LEDPattern.solid(Color.kYellow).blink(Seconds.of(1 / 8)), MessagePriority.F_L3, true)),
+            LEDPattern.solid(Color.YELLOW).blink(Seconds.of(1 / 8)), MessagePriority.F_L3, true)),
     L4(
         new RGBMessage(
-            LEDPattern.solid(Color.kBlue).blink(Seconds.of(1 / 8)), MessagePriority.G_L4, true)),
+            LEDPattern.solid(Color.BLUE).blink(Seconds.of(1 / 8)), MessagePriority.G_L4, true)),
     L1(
         new RGBMessage(
-            LEDPattern.solid(Color.kRed).blink(Seconds.of(1 / 8)), MessagePriority.H_L1, true)),
+            LEDPattern.solid(Color.RED).blink(Seconds.of(1 / 8)), MessagePriority.H_L1, true)),
     CORAL_DETECTED(
         new RGBMessage(
-            LEDPattern.solid(Color.kGreen).breathe(Seconds.of(2)),
+            LEDPattern.solid(Color.GREEN).breathe(Seconds.of(2)),
             MessagePriority.I_CORAL_DETECTED,
             true)),
     DEFAULT(
         new RGBMessage(
             LEDPattern.rainbow(255, 51)
-                .scrollAtAbsoluteSpeed(MetersPerSecond.of(0.5), Meters.of(0.01)),
+                .scrollAtAbsoluteVelocity(MetersPerSecond.of(0.5), Meters.of(0.01)),
             MessagePriority.J_DEFAULT,
             false));
 

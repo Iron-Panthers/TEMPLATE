@@ -16,12 +16,15 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Voltage;
+import frc.robot.Constants;
+import com.ctre.phoenix6.CANBus;
+import org.wpilib.hardware.bus.CANPort;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.util.Units;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.AngularVelocity;
+import org.wpilib.units.measure.Current;
+import org.wpilib.units.measure.Voltage;
 import frc.robot.MotorOutputManager;
 import frc.robot.subsystems.swerve.DriveConstants.Gains;
 import frc.robot.subsystems.swerve.DriveConstants.ModuleConfig;
@@ -55,9 +58,9 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
       new MotionMagicVoltage(0).withUpdateFreqHz(0);
 
   public ModuleIOTalonFX(ModuleConfig config) {
-    driveTalon = new TalonFX(config.driveID());
-    steerTalon = new TalonFX(config.steerID());
-    encoder = new CANcoder(config.encoderID());
+    driveTalon = new TalonFX(config.driveID(), Constants.CAN_BUS);
+    steerTalon = new TalonFX(config.steerID(), Constants.CAN_BUS);
+    encoder = new CANcoder(config.encoderID(), Constants.CAN_BUS);
 
     // Drive Config
     driveConfig.CurrentLimits.SupplyCurrentLimit = DRIVE_CURRENT_LIMIT_AMPS; // TODO: Make constant
@@ -219,7 +222,7 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
   }
 
   @Override
-  public void setNeutralMode(NeutralModeValue value) {
+  public void configNeutralMode(NeutralModeValue value) {
     if (driveConfig.MotorOutput.NeutralMode != value) {
       driveConfig.MotorOutput.NeutralMode = value;
       driveConfig.CurrentLimits.SupplyCurrentLimit = (value == NeutralModeValue.Brake) ? 30 : 40;
